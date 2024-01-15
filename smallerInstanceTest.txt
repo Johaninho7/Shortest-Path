@@ -1,0 +1,12 @@
+
+
+
+
+VehicleId,VehicleLocation,VehicleLocationId
+0,OsloV,3
+
+NodeId,Location,LocationId,TimeWindowStart,TimeWindowEnd,Weight,Volume,Revenue,ServiceTime
+1,OsloO,0,4,94,18,13,954.07,1.8
+2,Drammen,8,3,138,10,12,291.97,1.0
+3,KristiansandS,24,21,91,10,15,189.08,1.0
+4,Artificial,-1,0,147,0,0,0.0,0.0
