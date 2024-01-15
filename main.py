@@ -1,4 +1,4 @@
-import arcClass, solutionClass, network, parameterfreeNetwork, theAlgorithm, label, CSVreader
+import arcClass, network, parameterfreeNetwork, theAlgorithm, label, CSVreader
 import pprint
 
 distanceMatrix = 'DistanceMatrix.csv'
