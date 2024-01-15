@@ -67,7 +67,7 @@ def algorithm(paraNetwork):
 								time_nm = float(paraNetwork.originalNetwork.getTime(currentNodeTuple, nextTuple))
 								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
 								resourceExtension(newLabel, time_nm, dist_nm)
-
+						# Calculate delta after fstart sets timeToNext and distanceToNext
 						delta = paraNetwork.delta_l(newLabel, maxTimeDrive_R, maxTimeDrive_B, timeDay, minTimeRest)
 					# Edge from an intermediate node to another intermediate node
 					elif isinstance(edge[0], tuple) and isinstance(edge[1], tuple):
