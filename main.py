@@ -1,42 +1,32 @@
-from dataframing import CSVreader
-import arcClass, solutionClass, network, parameterfreeNetwork, theAlgorithm, label
-import pandas as pd
+import arcClass, solutionClass, network, parameterfreeNetwork, theAlgorithm, label, CSVreader
 import pprint
 
 distanceMatrix = 'DistanceMatrix.csv'
 timeMatrix = 'TimeMatrix.csv'
-timeMatrixCSV = pd.read_csv('/Users/johan/Desktop/solutionDictionary Approach/Dataset/TimeMatrix.csv')
-path = ('/Users/johan/Desktop/solutionDictionary Approach/Dataset')
-#solutionFilename = ('/Users/johan/Desktop/solutionDictionary Approach/Dataset/Results_PDPTW_with_driver_scheduling/BP output/Output Routes 10 with updated Subproblem.txt')
-#taskFilename = ('/Users/johan/Desktop/solutionDictionary Approach/Dataset/1D/1D10R1V48-144T10-20W.txt')
-testingInstanceFilename = ('/Users/johan/Desktop/class Approach/smallerInstanceTest.txt')
+
+testingInstanceFilename = 'smallerInstanceTest.txt'
 
 distanceData = CSVreader(distanceMatrix, path)
 timeData = CSVreader(timeMatrix, path)
 
+# Populate arcs with city data
 citiesArcs = arcClass.cityArcs.createArcs(distanceData, timeData)
 
-#print(f"Distance from Oslo to Drammen: {cities['OsloO'].distances['Drammen']} and time: {cities['OsloO'].times['Drammen']}")
-
-#solutions = solutionClass.solutionDataDict(solutionFilename)
-
-#print(f"Solution from testcase 3D10R3V24-48T10-20W.txt: Vehicles: {solutions['3D10R3V24-48T10-20W.txt'].vehicles} with solutions: {solutions['3D10R3V24-48T10-20W.txt'].solutions}")
 
 testNetwork = network.Network(testingInstanceFilename, citiesArcs)
 testNetwork.parse()
+# Print network nodes
 nodes = testNetwork.getNodes()
-#pprint.pprint(nodes)
-
-
-
-
 #pprint.pprint(nodes)
 
 paraNetwork = parameterfreeNetwork.parameterfreeNetwork(testNetwork)
 interNodes = paraNetwork._getIntermediateNodes()
+# Print intermediate nodes
 #pprint.pprint(interNodes)
+# Print all edges in parameterfree network
 #pprint.pprint(paraNetwork._getEdges())
 
+# Run the algortihm
 algo = theAlgorithm.algorithm(paraNetwork)
 
 
@@ -49,6 +39,9 @@ for l in algo:
 		bestLabel = label
 
 print(f"BEST LABEL: {bestLabel}")
+
+
+# Network and parameterfree network verification check
 """
 
 for edge in list(paraNetwork.edges.keys())[:20]:  # Checking first 5 edges for example
