@@ -6,8 +6,8 @@ timeMatrix = 'TimeMatrix.csv'
 
 testingInstanceFilename = 'smallerInstanceTest.txt'
 
-distanceData = CSVreader(distanceMatrix)
-timeData = CSVreader(timeMatrix)
+distanceData = CSVreader.CSVreader(distanceMatrix)
+timeData = CSVreader.CSVreader(timeMatrix)
 
 # Populate arcs with city data
 citiesArcs = arcClass.cityArcs.createArcs(distanceData, timeData)
