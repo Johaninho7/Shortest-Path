@@ -1,16 +1,10 @@
 import os
 
 
-def CSVreader(filename, folderPath):
-    # Check if the file exists in the folder
-    filepath = os.path.join(folderPath, filename)
-    if not os.path.exists(filepath):
-        print("File not found.")
-        return None
-
+def CSVreader(filename):
     cityData = {}
 
-    with open(filepath, "r") as file:
+    with open(filename, "r") as file:
         lines = file.readlines()
 
     # Assuming the first line contains city names (headers)
