@@ -44,7 +44,7 @@ def algorithm(paraNetwork):
 					
 					# Initialise new label
 					newLabel = copy.deepcopy(currentLabel)
-					currentNodeTuple = newLabel.detailedPath[-1]
+					
 					
 					# Edge from an original node to an intermediate node
 					if isinstance(edge[0], str) and isinstance(edge[1], tuple):
@@ -86,7 +86,6 @@ def algorithm(paraNetwork):
 							elif 'dull' in edge[0] and resourceExtension == paraNetwork._fbreak_delta:
 								if callable(resourceExtension):
 									# fbreak_delta
-									#if currentLabel.drive_B <= maxTimeDrive_B:
 									resourceExtension == paraNetwork._fbreak_delta
 									resourceExtension(newLabel, delta)
 									print(f'\n NEW LABEL: {newLabel}')
@@ -94,7 +93,6 @@ def algorithm(paraNetwork):
 							elif 'dull'	in edge[0] and resourceExtension == paraNetwork._frest_delta:
 								if callable(resourceExtension):
 									# frest_delta
-									 #if currentLabel.drive_R <= maxTimeDrive_R:
 									resourceExtension == paraNetwork._frest_delta
 									resourceExtension(newLabel, delta)
 							else:
