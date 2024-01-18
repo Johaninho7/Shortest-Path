@@ -157,14 +157,14 @@ def algorithm(paraNetwork):
 						labels.append(newLabel)
 						print(f'\n ADDED NEW LABEL: {newLabel}')
 						# Check dominance
-						#dominated = dominate.dominate(labels)
+						dominated = dominate.dominate(labels)
 
 
-						#numDominated += len(dominated)
+						numDominated += len(dominated)
 
 						# Setting done = True for all dominated labels to avoid expanding these again
-						#for i in dominated:
-						#	labels[i].done = True
+						for i in dominated:
+							labels[i].done = True
 
 		currentLabel.done = True
 		iterator += 1
