@@ -44,9 +44,6 @@ def algorithm(paraNetwork):
 					if edgeChecker.backToDepotEdge(edge):
 						continue
 					
-					# Initialise new label
-					#newLabel = copy.deepcopy(currentLabel)
-					
 					# Edge from an original node to an intermediate node
 					if edgeChecker.originalToIntermediateEdge(edge):
 						print(f"Edge from customer: {edge[0]} to fit intermediate node: {edge[1]}")
@@ -85,17 +82,14 @@ def algorithm(paraNetwork):
 								if callable(resourceExtension):
 									# fdrive_delta)
 									resourceExtension(newLabel, delta)
-									#newLabel.detailedPath.append(nextTuple)
-									#newLabel = copy.deepcopy(newLabel)
-									break
+									if newLabel.timeToNext == 0 or newLabel.drive_B >= minTimeBreak or newLabel.drive_R >= minTimeRest:
+										break
 							# In a dull intermedaite node, checking fbreak_delta REF
 							elif 'dull' in edge[0] and resourceExtension == paraNetwork._fbreak_delta:
 								if callable(resourceExtension):
 									# fbreak_delta
 									resourceExtension == paraNetwork._fbreak_delta
 									resourceExtension(newLabel, delta)
-									#newLabel.detailedPath.append(nextTuple)
-									#newLabel = copy.deepcopy(newLabel)
 									break
 
 							elif 'dull'	in edge[0] and resourceExtension == paraNetwork._frest_delta:
@@ -103,8 +97,6 @@ def algorithm(paraNetwork):
 									# frest_delta
 									resourceExtension == paraNetwork._frest_delta
 									resourceExtension(newLabel, delta)
-									#newLabel.detailedPath.append(nextTuple)
-									#newLabel = copy.deepcopy(newLabel)
 									break
 							else:
 								if callable(resourceExtension):
@@ -127,7 +119,6 @@ def algorithm(paraNetwork):
 								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
 								resourceExtension(newLabel, TWS_m, TWE_m, ST_m, nextTuple, dist_nm)
 								newLabel.elem[int(nextTuple)] += 1
-								#newLabel.detailedPath.append(nextTuple)
 								newLabel = copy.deepcopy(newLabel)
 
 						elif 'dull' in edge[0] and resourceExtension == paraNetwork._fvisit_nm and newLabel.timeToNext == 0:
@@ -139,7 +130,6 @@ def algorithm(paraNetwork):
 								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
 								resourceExtension(newLabel, TWS_m, TWE_m, ST_m, nextTuple, dist_nm)
 								newLabel.elem[int(nextTuple)] += 1
-								#newLabel.detailedPath.append(nextTuple)
 								newLabel = copy.deepcopy(newLabel)
 					
 					# Add next node to detailed path
