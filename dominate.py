@@ -8,11 +8,11 @@ def dominate(labelList):
 
 	# Compare the last added label to the existing labels
 	lastLabel = len(labelList)-1
-	lastInPathLastLabel = len(labelList[lastLabel].path)-1
+	lastInPathLastLabel = len(labelList[lastLabel].detailedPath)-1
 	for i in range(len(labelList)-1):
-		lastInPath = len(labelList[i].path)-1
+		lastInPath = len(labelList[i].detailedPath)-1
 		# Can only dominate a label if the two compared labels have visited the same node as their last visit
-		if (labelList[lastLabel].path[lastInPathLastLabel] == labelList[i].path[lastInPath]):
+		if (labelList[lastLabel].detailedPath[lastInPathLastLabel] == labelList[i].detailedPath[lastInPath]):
 			# If both labels are equal we dominate the latest added label
 			if (labelList[lastLabel].time == labelList[i].time and labelList[lastLabel].drive_R == labelList[i].drive_R and labelList[lastLabel].drive_B == labelList[i].drive_B and labelList[lastLabel].elapsed_R == labelList[i].elapsed_R and np.all(np.asarray(labelList[lastLabel].elem) == np.asarray(labelList[i].elem))):
 				labelList[lastLabel].done = True

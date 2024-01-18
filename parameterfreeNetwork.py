@@ -31,10 +31,10 @@ class parameterfreeNetwork:
 			if state == 'fit':
 				# Adding edges from original node to fit node
 				edges[n, (n, 'fit', m)] = {'REF': self._determine_REF('start', n, m)}
-				# Adding edges from fit node to end node
-				edges[('fit', n, m), m] = {'REF': self._determine_REF('visit', n, m)}
 				# Adding edges from fit node to dull node
 				edges[('fit', n, m), ('dull', n, m)] = {'REF': self._determine_REF('drive', n, m)}
+				# Adding edges from fit node to end node
+				edges[('fit', n, m), m] = {'REF': self._determine_REF('visit', n, m)}
 			elif state == 'dull':
 				# Adding edges from original node to dull node
 				edges[n, (n, 'dull', m)] = {'REF': self._determine_REF('start', n, m)}

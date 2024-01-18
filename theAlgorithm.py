@@ -1,4 +1,4 @@
-import label, copy, arcClass, time, parameterfreeNetwork, copy, isFeasible, dominate, pprint
+import label, copy, arcClass, time, parameterfreeNetwork, copy, isFeasible, dominate, pprint, edgeChecker
 
 
 # Parameters
@@ -28,7 +28,7 @@ def algorithm(paraNetwork):
 
 	while iterator < len(labels):
 		currentLabel = labels[iterator]
-		currentNodeTuple = currentLabel.detailedPath[-1]
+		currentNodeTuple = currentLabel.path[-1]
 		print(f"\nITERATION {iterator}: Processing label {currentLabel}")
 		print(f"\nCURRENTLY IN: {currentNodeTuple}")
 		print(f"\nCURRENT DETAILED PATH: {currentLabel.detailedPath}")
@@ -38,16 +38,17 @@ def algorithm(paraNetwork):
 		if (labels[iterator].done == False):
 			# Iterate over edges starting from the current node
 			for edge, edgeData in paraNetwork.edges.items():
-				if isinstance(edge, tuple) and (edge[0] == currentNodeTuple or 
-					(isinstance(edge[0], tuple) and currentNodeTuple in edge[0] and currentNodeTuple != edge[0][-1]) or
-					(isinstance(currentNodeTuple, str) and edge[0] == currentNodeTuple)):
+				# Check if currentNodeTuple is in the edge
+				if edgeChecker.edgeChecker(currentNodeTuple, edge):
+
+					if edgeChecker.backToDepotEdge(edge):
+						continue
 					
 					# Initialise new label
-					newLabel = copy.deepcopy(currentLabel)
-					
+					#newLabel = copy.deepcopy(currentLabel)
 					
 					# Edge from an original node to an intermediate node
-					if isinstance(edge[0], str) and isinstance(edge[1], tuple):
+					if edgeChecker.originalToIntermediateEdge(edge):
 						print(f"Edge from customer: {edge[0]} to fit intermediate node: {edge[1]}")
 						resourceExtension = edgeData['REF']
 						if 'fit' in edge[1] and resourceExtension == paraNetwork._fstart_nm:
@@ -56,6 +57,8 @@ def algorithm(paraNetwork):
 								# fstart_nm
 								time_nm = float(paraNetwork.originalNetwork.getTime(currentNodeTuple, nextTuple))
 								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
+								newLabel = copy.deepcopy(currentLabel)
+								newLabel.detailedPath.append(nextTuple)
 								resourceExtension(newLabel, time_nm, dist_nm)
 
 						elif 'dull' in edge[1] and resourceExtension == paraNetwork._fstart_nm:
@@ -66,66 +69,78 @@ def algorithm(paraNetwork):
 								# fstart_nm
 								time_nm = float(paraNetwork.originalNetwork.getTime(currentNodeTuple, nextTuple))
 								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
+								newLabel = copy.deepcopy(currentLabel)
+								newLabel.detailedPath.append(nextTuple)
 								resourceExtension(newLabel, time_nm, dist_nm)
 						# Calculate delta after fstart sets timeToNext and distanceToNext
 						delta = paraNetwork.delta_l(newLabel, maxTimeDrive_R, maxTimeDrive_B, timeDay, minTimeRest)
 					# Edge from an intermediate node to another intermediate node
-					elif isinstance(edge[0], tuple) and isinstance(edge[1], tuple):
+					elif edgeChecker.intermediateToIntermediateEdge(edge):
 						print(f"Edge from intermediate node: {edge[0]} to intermediate node: {edge[1]}")
 						nextTuple = edge[1]
 						resourceExtension = edgeData['REF']
 						while newLabel.timeToNext > 0:
+							delta = paraNetwork.delta_l(newLabel, maxTimeDrive_R, maxTimeDrive_B, timeDay, minTimeRest)
 							if 'fit' in edge[0] and resourceExtension == paraNetwork._fdrive_delta:
 								if callable(resourceExtension):
-									# fdrive_delta
-									print(f'\n delta before drive: {delta}')
+									# fdrive_delta)
 									resourceExtension(newLabel, delta)
-									print(f'\n delta after drive: {delta}')
-							
+									#newLabel.detailedPath.append(nextTuple)
+									#newLabel = copy.deepcopy(newLabel)
+									break
 							# In a dull intermedaite node, checking fbreak_delta REF
 							elif 'dull' in edge[0] and resourceExtension == paraNetwork._fbreak_delta:
 								if callable(resourceExtension):
 									# fbreak_delta
 									resourceExtension == paraNetwork._fbreak_delta
 									resourceExtension(newLabel, delta)
-									print(f'\n NEW LABEL: {newLabel}')
+									#newLabel.detailedPath.append(nextTuple)
+									#newLabel = copy.deepcopy(newLabel)
+									break
 
 							elif 'dull'	in edge[0] and resourceExtension == paraNetwork._frest_delta:
 								if callable(resourceExtension):
 									# frest_delta
 									resourceExtension == paraNetwork._frest_delta
 									resourceExtension(newLabel, delta)
+									#newLabel.detailedPath.append(nextTuple)
+									#newLabel = copy.deepcopy(newLabel)
+									break
 							else:
 								if callable(resourceExtension):
 									# If unsure, rest
 									resourceExtension == paraNetwork._frest_delta
-									delta = paraNetwork.delta_l(newLabel, maxTimeDrive_R, maxTimeDrive_B, timeDay, minTimeRest)
 									resourceExtension(newLabel, delta)
+									break
 					
 					# Edge from an intermediate node to an original node
-					elif isinstance(edge[0], tuple) and isinstance(edge[1], str):
+					elif edgeChecker.intermediateToOriginalEdge(edge):
 						print(f"Edge from intermediate node: {edge[0]} to customer node: {edge[1]}")
-						nextNodeId = edge[1]
-						nextTuple = edge[1]
 						resourceExtension = edgeData['REF']
 						if 'fit' in edge[0] and resourceExtension == paraNetwork._fvisit_nm and newLabel.timeToNext == 0:
 							# Access and call the REF method
 							if callable(resourceExtension):
 								# fvisit_nm
-								TWS_m, TWE_m = paraNetwork.originalNetwork.getTimeWindows(nextNodeId)
+								nextTuple = edge[1]
+								TWS_m, TWE_m = paraNetwork.originalNetwork.getTimeWindows(nextTuple)
 								ST_m = paraNetwork.originalNetwork.getServiceTime(nextTuple)
-								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextNodeId))
-								resourceExtension(newLabel, TWS_m, TWE_m, ST_m, nextNodeId, dist_nm)
-								newLabel.elem[int(nextNodeId)] += 1
+								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
+								resourceExtension(newLabel, TWS_m, TWE_m, ST_m, nextTuple, dist_nm)
+								newLabel.elem[int(nextTuple)] += 1
+								#newLabel.detailedPath.append(nextTuple)
+								newLabel = copy.deepcopy(newLabel)
 
 						elif 'dull' in edge[0] and resourceExtension == paraNetwork._fvisit_nm and newLabel.timeToNext == 0:
 							if callable(resourceExtension):
 								# fvisit_nm
+								nextTuple = edge[1]
 								TWS_m, TWE_m = paraNetwork.originalNetwork.getTimeWindows(nextTuple)
 								ST_m = paraNetwork.originalNetwork.getServiceTime(nextTuple)
 								dist_nm = float(paraNetwork.originalNetwork.getDistance(currentNodeTuple, nextTuple))
-								resourceExtension(newLabel, TWS_m, TWE_m, ST_m, nextNodeId, dist_nm)
-								newLabel.elem[int(nextNodeId)] += 1
+								resourceExtension(newLabel, TWS_m, TWE_m, ST_m, nextTuple, dist_nm)
+								newLabel.elem[int(nextTuple)] += 1
+								#newLabel.detailedPath.append(nextTuple)
+								newLabel = copy.deepcopy(newLabel)
 					
 					# Add next node to detailed path
 					newLabel.detailedPath.append(nextTuple)
@@ -142,14 +157,14 @@ def algorithm(paraNetwork):
 						labels.append(newLabel)
 						print(f'\n ADDED NEW LABEL: {newLabel}')
 						# Check dominance
-						dominated = dominate.dominate(labels)
+						#dominated = dominate.dominate(labels)
 
 
-						numDominated += len(dominated)
+						#numDominated += len(dominated)
 
 						# Setting done = True for all dominated labels to avoid expanding these again
-						for i in dominated:
-							labels[i].done = True
+						#for i in dominated:
+						#	labels[i].done = True
 
 		currentLabel.done = True
 		iterator += 1
